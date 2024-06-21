@@ -13,6 +13,7 @@ dependencies:
   archive: ^3.4.10
   async: ^2.11.0
   badges: ^3.1.2
+  barcode_scan2: ^4.3.0
   blurhash_dart: ^1.2.1
   callkeep: ^0.3.2
   chewie: ^1.8.1
@@ -25,7 +26,8 @@ dependencies:
   emoji_picker_flutter: ^2.1.1
   emoji_proposal: ^0.0.1
   emojis: ^0.9.9
-  #fcm_shared_isolate: ^0.1.0
+  fcm_shared_isolate: ^0.1.0
+  encrypt: ^5.0.3
   file_picker: ^8.0.1
   flutter:
     sdk: flutter
@@ -65,7 +67,9 @@ dependencies:
   latlong2: ^0.9.1
   linkify: ^5.0.0
   matrix: ^0.29.9
+  mobile_scanner: ^5.1.1
   native_imaging: ^0.1.1
+  open_filex: ^4.4.0
   package_info_plus: ^6.0.0
   pasteboard: ^0.2.0
   path: ^1.9.0
@@ -93,6 +97,8 @@ dependencies:
   video_player: ^2.8.5
   wakelock_plus: ^1.2.2
   webrtc_interface: ^1.0.13
+  qr_flutter: ^4.1.0
+  top_snackbar_flutter: ^3.1.0
 
 dev_dependencies:
   flutter_lints: ^3.0.0
@@ -116,6 +122,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - assets/keys/
     - assets/sounds/
     - assets/js/
     - assets/js/package/
@@ -139,7 +146,7 @@ msix_config:
   display_name: FluffyChat
   publisher_display_name: FluffyChat
   publisher: CN=FluffyChat, O=Head of bad integration tests, L=Matrix, S=Internet, C=EU
-  identity_name: chat.fluffy.fluffychat
+  identity_name: de.hermannschule.hermannpost
   logo_path: assets\logo.png
   capabilities: internetClient, location, microphone, webcam
   protocol_activation: https

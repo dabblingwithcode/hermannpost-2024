@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -6,12 +8,13 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:matrix/encryption.dart';
 import 'package:matrix/matrix.dart';
-
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:fluffychat/config/themes.dart';
 import 'package:fluffychat/utils/error_reporter.dart';
 import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/utils/localized_exception_extension.dart';
 import 'package:fluffychat/utils/platform_infos.dart';
+import 'package:pretty_qr_code/pretty_qr_code.dart';
 import '../../utils/adaptive_bottom_sheet.dart';
 import '../key_verification/key_verification_dialog.dart';
 
@@ -97,6 +100,8 @@ class BootstrapDialogState extends State<BootstrapDialog> {
         _recoveryKeyStored == false) {
       final key = bootstrap.newSsssKey!.recoveryKey;
       titleText = L10n.of(context)!.recoveryKey;
+      final qrCodeSize =
+          min(MediaQuery.of(context).size.width - 16, 256).toDouble();
       return Scaffold(
         appBar: AppBar(
           centerTitle: true,
@@ -124,10 +129,10 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                   ),
                   subtitle: Text(L10n.of(context)!.chatBackupDescription),
                 ),
-                const Divider(
-                  height: 32,
-                  thickness: 1,
-                ),
+                // const Divider(
+                //   height: 32,
+                //   thickness: 1,
+                // ),
                 TextField(
                   minLines: 2,
                   maxLines: 4,
@@ -140,6 +145,16 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                Center(
+                  child: Container(
+                    color: Colors.white,
+                    child: QrImageView(
+                      data: key.toString(),
+                      version: QrVersions.auto,
+                      size: qrCodeSize,
+                    ),
+                  ),
+                ),
                 if (_supportsSecureStorage)
                   CheckboxListTile.adaptive(
                     contentPadding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -466,7 +481,7 @@ class BootstrapDialogState extends State<BootstrapDialog> {
                 L10n.of(context)!.yourChatBackupHasBeenSetUp,
                 style: const TextStyle(fontSize: 20),
               ),
-              const SizedBox(height: 16),
+              //const SizedBox(height: 16),
             ],
           );
           buttons.add(

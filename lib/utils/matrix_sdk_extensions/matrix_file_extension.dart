@@ -8,6 +8,7 @@ import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:matrix/matrix.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:universal_html/html.dart' as html;
+import 'package:open_filex/open_filex.dart';
 
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/utils/size_string.dart';
@@ -35,12 +36,49 @@ extension MatrixFileExtension on MatrixFile {
       if (result.error != null) return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(
-          L10n.of(context)!.fileHasBeenSavedAt(downloadPath),
-        ),
-      ),
+    _showMyDialog(context, downloadPath);
+  }
+
+  Future<void> _showMyDialog(BuildContext context, String downloadPath) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Herunterladen erfolgreich!'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                const Text('Datei gespeichert unter:'),
+                const Padding(
+                  padding: EdgeInsets.symmetric(
+                    vertical: 4.0,
+                  ),
+                ),
+                Text(
+                  downloadPath,
+                  style: const TextStyle(fontWeight: FontWeight.bold),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Schließen'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Datei öffnen'),
+              onPressed: () {
+                OpenFilex.open(downloadPath);
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
     );
   }
 

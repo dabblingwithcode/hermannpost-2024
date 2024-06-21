@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -33,7 +35,11 @@ class ChatDetails extends StatefulWidget {
 }
 
 class ChatDetailsController extends State<ChatDetails> {
+  List<User>? members;
+  List<User>? filteredMembers;
   bool displaySettings = false;
+  int powerlevel = 0;
+  bool canInvite = false;
 
   void toggleDisplaySettings() =>
       setState(() => displaySettings = !displaySettings);
@@ -185,7 +191,67 @@ class ChatDetailsController extends State<ChatDetails> {
   }
 
   static const fixedWidth = 360.0;
+  final TextEditingController searchController = TextEditingController();
+  bool isSearchMode = false;
+  bool isSearching = false;
+  Timer? _coolDown;
+
+  void _search() async {
+    final client = Matrix.of(context).client;
+    if (!isSearching) {
+      setState(() {
+        isSearching = true;
+      });
+    }
+
+    if (!isSearchMode) return;
+    setState(() {
+      isSearching = false;
+    });
+  }
+
+  void cancelSearch({bool unfocus = true}) {
+    setState(() {
+      searchController.clear();
+      isSearchMode = false;
+      filteredMembers = List.from(members!);
+      isSearching = false;
+    });
+
+    if (unfocus) FocusManager.instance.primaryFocus?.unfocus();
+  }
+
+  void onSearchEnter(String text) {
+    if (text.isEmpty) {
+      cancelSearch(unfocus: false);
+      return;
+    }
+
+    setState(() {
+      isSearchMode = true;
+      filteredMembers = members!
+          .where((user) =>
+              user.calcDisplayname().toLowerCase().contains(text.toLowerCase()))
+          .toList();
+    });
+
+    _coolDown?.cancel();
+    _coolDown = Timer(const Duration(milliseconds: 500), _search);
+  }
 
   @override
-  Widget build(BuildContext context) => ChatDetailsView(this);
+  Widget build(BuildContext context) {
+    final client = Matrix.of(context).client;
+    final userId = client.userID;
+    members ??= client.getRoomById(roomId!)!.getParticipants();
+    filteredMembers ??= List.from(members!);
+    final thisCanInvite = client.getRoomById(roomId!)?.canInvite;
+    final thisPowerLevel =
+        client.getRoomById(roomId!)?.getPowerLevelByUserId(userId!);
+    setState(() {
+      powerlevel = thisPowerLevel!;
+      canInvite = thisCanInvite!;
+    });
+    return ChatDetailsView(this);
+  }
 }

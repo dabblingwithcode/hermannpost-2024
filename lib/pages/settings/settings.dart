@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:fluffychat/config/app_config.dart';
+
 import 'package:flutter/material.dart';
 
 import 'package:adaptive_dialog/adaptive_dialog.dart';
@@ -12,6 +14,7 @@ import 'package:matrix/matrix.dart';
 
 import 'package:fluffychat/utils/platform_infos.dart';
 import 'package:fluffychat/widgets/app_lock.dart';
+import '../../config/setting_keys.dart';
 import '../../widgets/matrix.dart';
 import '../bootstrap/bootstrap_dialog.dart';
 import 'settings_view.dart';
@@ -31,6 +34,19 @@ class SettingsController extends State<Settings> {
         profileUpdated = true;
         profileFuture = null;
       });
+
+  void changeTeacherStatus() async {
+    final bool newStatus;
+    if (AppConfig.isTeacher == true) {
+      newStatus = false;
+    } else {
+      newStatus = true;
+    }
+    await Matrix.of(context).store.setBool(SettingKeys.isTeacher, newStatus);
+    setState(() {
+      AppConfig.isTeacher = newStatus;
+    });
+  }
 
   void setDisplaynameAction() async {
     final profile = await profileFuture;
@@ -73,6 +89,10 @@ class SettingsController extends State<Settings> {
         OkCancelResult.cancel) {
       return;
     }
+    await Matrix.of(context).store.setBool(SettingKeys.isTeacher, false);
+    setState(() {});
+    AppConfig.isTeacher = false;
+
     final matrix = Matrix.of(context);
     await showFutureLoadingDialog(
       context: context,

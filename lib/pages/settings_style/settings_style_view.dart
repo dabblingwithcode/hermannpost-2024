@@ -166,31 +166,31 @@ class SettingsStyleView extends StatelessWidget {
               title: Text(L10n.of(context)!.darkTheme),
               onChanged: controller.switchTheme,
             ),
-            Divider(
-              height: 1,
-              color: Theme.of(context).dividerColor,
-            ),
-            ListTile(
-              title: Text(
-                L10n.of(context)!.overview,
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.secondary,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-            SettingsSwitchListTile.adaptive(
-              title: L10n.of(context)!.presencesToggle,
-              onChanged: (b) => AppConfig.showPresences = b,
-              storeKey: SettingKeys.showPresences,
-              defaultValue: AppConfig.showPresences,
-            ),
-            SettingsSwitchListTile.adaptive(
-              title: L10n.of(context)!.separateChatTypes,
-              onChanged: (b) => AppConfig.separateChatTypes = b,
-              storeKey: SettingKeys.separateChatTypes,
-              defaultValue: AppConfig.separateChatTypes,
-            ),
+            // Divider(
+            //   height: 1,
+            //   color: Theme.of(context).dividerColor,
+            // ),
+            // ListTile(
+            //   title: Text(
+            //     L10n.of(context)!.overview,
+            //     style: TextStyle(
+            //       color: Theme.of(context).colorScheme.secondary,
+            //       fontWeight: FontWeight.bold,
+            //     ),
+            //   ),
+            // ),
+            // SettingsSwitchListTile.adaptive(
+            //   title: L10n.of(context)!.presencesToggle,
+            //   onChanged: (b) => AppConfig.showPresences = b,
+            //   storeKey: SettingKeys.showPresences,
+            //   defaultValue: AppConfig.showPresences,
+            // ),
+            // SettingsSwitchListTile.adaptive(
+            //   title: L10n.of(context)!.separateChatTypes,
+            //   onChanged: (b) => AppConfig.separateChatTypes = b,
+            //   storeKey: SettingKeys.separateChatTypes,
+            //   defaultValue: AppConfig.separateChatTypes,
+            // ),
             Divider(
               height: 1,
               color: Theme.of(context).dividerColor,

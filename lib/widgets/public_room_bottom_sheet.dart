@@ -6,7 +6,6 @@ import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
 
-import 'package:fluffychat/utils/fluffy_share.dart';
 import 'package:fluffychat/utils/url_launcher.dart';
 import 'package:fluffychat/widgets/avatar.dart';
 import 'package:fluffychat/widgets/matrix.dart';
@@ -85,27 +84,27 @@ class PublicRoomBottomSheet extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: Text(
-            chunk?.name ?? roomAlias ?? chunk?.roomId ?? 'Unknown',
-            overflow: TextOverflow.fade,
-          ),
+          // title: Text(
+          //   chunk?.name ?? roomAlias ?? chunk?.roomId ?? 'Unknown',
+          //   overflow: TextOverflow.fade,
+          // ),
           leading: IconButton(
             icon: const Icon(Icons.arrow_downward_outlined),
             onPressed: Navigator.of(context, rootNavigator: false).pop,
             tooltip: L10n.of(context)!.close,
           ),
-          actions: [
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: IconButton(
-                icon: Icon(Icons.adaptive.share_outlined),
-                onPressed: () => FluffyShare.share(
-                  'https://matrix.to/#/${roomAlias ?? chunk?.roomId}',
-                  context,
-                ),
-              ),
-            ),
-          ],
+          //actions: [
+          // Padding(
+          //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          //   child: IconButton(
+          //     icon: Icon(Icons.adaptive.share_outlined),
+          //     onPressed: () => FluffyShare.share(
+          //       'https://matrix.to/#/${roomAlias ?? chunk?.roomId}',
+          //       context,
+          //     ),
+          //   ),
+          // ),
+          // ],
         ),
         body: FutureBuilder<PublicRoomsChunk>(
           future: _search(context),
@@ -128,14 +127,70 @@ class PublicRoomBottomSheet extends StatelessWidget {
                 else
                   Center(
                     child: Padding(
-                      padding: const EdgeInsets.all(16.0),
+                      padding: const EdgeInsets.only(bottom: 16.0),
                       child: Avatar(
                         mxContent: profile.avatarUrl,
                         name: profile.name ?? roomAlias,
-                        size: Avatar.defaultSize * 3,
+                        size: Avatar.defaultSize * 3.5,
                       ),
                     ),
                   ),
+
+                const SizedBox(height: 16),
+                ListTile(
+                  title: Center(
+                    child: Text(
+                      profile?.name ??
+                          roomAlias?.localpart ??
+                          chunk!.roomId.localpart ??
+                          '',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 21,
+                      ),
+                    ),
+                  ),
+                  subtitle: Center(
+                    child: Text(
+                      '${L10n.of(context)!.participant}: ${profile?.numJoinedMembers ?? 0}',
+                      style: const TextStyle(fontSize: 16),
+                    ),
+                  ),
+                ),
+                if (profile?.topic?.isNotEmpty ?? false)
+                  ListTile(
+                    title: Center(
+                      child: SelectableLinkify(
+                        text: profile!.topic!,
+                        linkStyle: const TextStyle(
+                          color: Colors.blueAccent,
+                          decorationColor: Colors.blueAccent,
+                        ),
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Theme.of(context).textTheme.bodyMedium!.color,
+                        ),
+                        options: const LinkifyOptions(humanize: false),
+                        onOpen: (url) =>
+                            UrlLauncher(context, url.url).launchUrl(),
+                      ),
+                    ),
+                  ),
+                // if (roomAlias != null)
+                //   ListTile(
+                //     title: Text(L10n.of(context)!.publicLink),
+                //     subtitle: SelectableText(roomAlias),
+                //     contentPadding:
+                //         const EdgeInsets.symmetric(horizontal: 16.0),
+                //     trailing: IconButton(
+                //       icon: const Icon(Icons.copy_outlined),
+                //       onPressed: () => FluffyShare.share(
+                //         roomAlias,
+                //         context,
+                //       ),
+                //     ),
+                //   ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16.0),
                   child: ElevatedButton.icon(
@@ -149,55 +204,14 @@ class PublicRoomBottomSheet extends StatelessWidget {
                           ? L10n.of(context)!.knock
                           : chunk?.roomType == 'm.space'
                               ? L10n.of(context)!.joinSpace
-                              : L10n.of(context)!.joinRoom,
+                              : L10n.of(context)!.joinRoom.toUpperCase(),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     icon: const Icon(Icons.login_outlined),
                   ),
                 ),
-                const SizedBox(height: 16),
-                ListTile(
-                  title: Text(
-                    profile?.name ??
-                        roomAlias?.localpart ??
-                        chunk?.roomId.localpart ??
-                        L10n.of(context)!.chat,
-                  ),
-                  subtitle: Text(
-                    '${L10n.of(context)!.participant}: ${profile?.numJoinedMembers ?? 0}',
-                  ),
-                  trailing: const Icon(Icons.account_box_outlined),
-                ),
-                if (roomAlias != null)
-                  ListTile(
-                    title: Text(L10n.of(context)!.publicLink),
-                    subtitle: SelectableText(roomAlias),
-                    contentPadding:
-                        const EdgeInsets.symmetric(horizontal: 16.0),
-                    trailing: IconButton(
-                      icon: const Icon(Icons.copy_outlined),
-                      onPressed: () => FluffyShare.share(
-                        roomAlias,
-                        context,
-                      ),
-                    ),
-                  ),
-                if (profile?.topic?.isNotEmpty ?? false)
-                  ListTile(
-                    subtitle: SelectableLinkify(
-                      text: profile!.topic!,
-                      linkStyle: const TextStyle(
-                        color: Colors.blueAccent,
-                        decorationColor: Colors.blueAccent,
-                      ),
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Theme.of(context).textTheme.bodyMedium!.color,
-                      ),
-                      options: const LinkifyOptions(humanize: false),
-                      onOpen: (url) =>
-                          UrlLauncher(context, url.url).launchUrl(),
-                    ),
-                  ),
               ],
             );
           },

@@ -1,4 +1,4 @@
-package chat.fluffy.fluffychat
+package de.hermannschule.hermannpost
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -12,7 +12,6 @@ class MainActivity : FlutterActivity() {
         super.attachBaseContext(base)
         MultiDex.install(this)
     }
-
 
     override fun provideFlutterEngine(context: Context): FlutterEngine? {
         return provideEngine(this)

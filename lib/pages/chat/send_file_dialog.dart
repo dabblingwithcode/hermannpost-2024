@@ -101,29 +101,30 @@ class SendFileDialogState extends State<SendFileDialog> {
           ),
           const SizedBox(height: 16),
           // Workaround for SwitchListTile.adaptive crashes in CupertinoDialog
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              CupertinoSwitch(
-                value: origImage,
-                onChanged: (v) => setState(() => origImage = v),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      L10n.of(context)!.sendOriginal,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(sizeString),
-                  ],
+          if (AppConfig.isTeacher)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                CupertinoSwitch(
+                  value: origImage,
+                  onChanged: (v) => setState(() => origImage = v),
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        L10n.of(context)!.sendOriginal,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(sizeString),
+                    ],
+                  ),
+                ),
+              ],
+            ),
         ],
       );
     } else if (widget.files.every((file) => file is MatrixVideoFile)) {

@@ -1,3 +1,4 @@
+import 'package:fluffychat/pages/settings/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -25,63 +26,54 @@ class ChatListView extends StatelessWidget {
   List<NavigationDestination> getNavigationDestinations(BuildContext context) {
     final badgePosition = BadgePosition.topEnd(top: -12, end: -8);
     return [
-      if (AppConfig.separateChatTypes) ...[
-        NavigationDestination(
-          icon: UnreadRoomsBadge(
-            badgePosition: badgePosition,
-            filter:
-                controller.getRoomFilterByActiveFilter(ActiveFilter.messages),
-            child: const Icon(Icons.chat_outlined),
+      NavigationDestination(
+        icon: UnreadRoomsBadge(
+          badgePosition: badgePosition,
+          filter: controller.getRoomFilterByActiveFilter(ActiveFilter.allChats),
+          child: Image.asset(
+            'assets/hp_icon_border.png',
+            scale: 8,
           ),
-          selectedIcon: UnreadRoomsBadge(
-            badgePosition: badgePosition,
-            filter:
-                controller.getRoomFilterByActiveFilter(ActiveFilter.messages),
-            child: const Icon(Icons.chat),
-          ),
-          label: L10n.of(context)!.messages,
         ),
-        NavigationDestination(
-          icon: UnreadRoomsBadge(
-            badgePosition: badgePosition,
-            filter: controller.getRoomFilterByActiveFilter(ActiveFilter.groups),
-            child: const Icon(Icons.group_outlined),
+        selectedIcon: UnreadRoomsBadge(
+          badgePosition: badgePosition,
+          filter: controller.getRoomFilterByActiveFilter(ActiveFilter.allChats),
+          child: Image.asset(
+            'assets/hp_icon_border.png',
+            scale: 5,
           ),
-          selectedIcon: UnreadRoomsBadge(
-            badgePosition: badgePosition,
-            filter: controller.getRoomFilterByActiveFilter(ActiveFilter.groups),
-            child: const Icon(Icons.group),
-          ),
-          label: L10n.of(context)!.groups,
         ),
-      ] else
-        NavigationDestination(
-          icon: UnreadRoomsBadge(
-            badgePosition: badgePosition,
-            filter:
-                controller.getRoomFilterByActiveFilter(ActiveFilter.allChats),
-            child: const Icon(Icons.chat_outlined),
-          ),
-          selectedIcon: UnreadRoomsBadge(
-            badgePosition: badgePosition,
-            filter:
-                controller.getRoomFilterByActiveFilter(ActiveFilter.allChats),
-            child: const Icon(Icons.chat),
-          ),
-          label: L10n.of(context)!.chats,
+        label: L10n.of(context)!.messages,
+      ),
+      NavigationDestination(
+        icon: Image.asset(
+          'assets/hp-discover.png',
+          scale: 6,
         ),
-      if (controller.spaces.isNotEmpty)
-        const NavigationDestination(
-          icon: Icon(Icons.workspaces_outlined),
-          selectedIcon: Icon(Icons.workspaces),
-          label: 'Spaces',
+        selectedIcon: Image.asset(
+          'assets/hp-discover.png',
+          scale: 5,
         ),
+        label: L10n.of(context)!.discover,
+      ),
+      NavigationDestination(
+        icon: Image.asset(
+          'assets/hp-settings.png',
+          scale: 7,
+        ),
+        selectedIcon: Image.asset(
+          'assets/hp-settings.png',
+          scale: 6,
+        ),
+        label: L10n.of(context)!.settings,
+      ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
     final client = Matrix.of(context).client;
+
     return StreamBuilder<Object?>(
       stream: Matrix.of(context).onShareContentChanged.stream,
       builder: (_, __) {
@@ -89,10 +81,7 @@ class ChatListView extends StatelessWidget {
         return PopScope(
           canPop: controller.selectMode == SelectMode.normal &&
               !controller.isSearchMode &&
-              controller.activeFilter ==
-                  (AppConfig.separateChatTypes
-                      ? ActiveFilter.messages
-                      : ActiveFilter.allChats),
+              controller.activeFilter == (ActiveFilter.allChats),
           onPopInvoked: (pop) async {
             if (pop) return;
             final selMode = controller.selectMode;
@@ -104,12 +93,10 @@ class ChatListView extends StatelessWidget {
               controller.cancelAction();
               return;
             }
-            if (controller.activeFilter !=
-                (AppConfig.separateChatTypes
-                    ? ActiveFilter.messages
-                    : ActiveFilter.allChats)) {
+            if (controller.activeFilter != ActiveFilter.allChats) {
               controller
                   .onDestinationSelected(AppConfig.separateChatTypes ? 1 : 0);
+              controller.activeFilter = ActiveFilter.allChats;
               return;
             }
           },
@@ -147,9 +134,9 @@ class ChatListView extends StatelessWidget {
                             );
                           }
                           i -= destinations.length;
-                          final isSelected =
-                              controller.activeFilter == ActiveFilter.spaces &&
-                                  rootSpaces[i].id == controller.activeSpaceId;
+                          final isSelected = controller.activeFilter ==
+                                  ActiveFilter.settings &&
+                              rootSpaces[i].id == controller.activeSpaceId;
                           return NaviRailItem(
                             toolTip: rootSpaces[i].getLocalizedDisplayname(
                               MatrixLocals(L10n.of(context)!),
@@ -181,12 +168,15 @@ class ChatListView extends StatelessWidget {
                   excludeFromSemantics: true,
                   behavior: HitTestBehavior.translucent,
                   child: Scaffold(
-                    body: ChatListViewBody(controller),
+                    body: controller.activeFilter == ActiveFilter.settings
+                        ? const Settings()
+                        : ChatListViewBody(controller),
                     bottomNavigationBar: controller.displayNavigationBar
                         ? NavigationBar(
-                            elevation: 4,
+                            height: 70,
                             labelBehavior:
                                 NavigationDestinationLabelBehavior.alwaysShow,
+                            indicatorColor: Colors.transparent,
                             shadowColor:
                                 Theme.of(context).colorScheme.onSurface,
                             backgroundColor:
@@ -207,7 +197,8 @@ class ChatListView extends StatelessWidget {
                       onKeysPressed: () => context.go('/rooms/newprivatechat'),
                       helpLabel: L10n.of(context)!.newChat,
                       child: selectMode == SelectMode.normal &&
-                              !controller.isSearchMode
+                              !controller.isSearchMode &&
+                              controller.activeFilter == ActiveFilter.allChats
                           ? StartChatFloatingActionButton(
                               activeFilter: controller.activeFilter,
                               roomsIsEmpty: false,

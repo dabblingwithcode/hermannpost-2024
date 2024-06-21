@@ -28,14 +28,14 @@ class EncryptionButton extends StatelessWidget {
                 ? L10n.of(context)!.encrypted
                 : L10n.of(context)!.encryptionNotEnabled,
             icon: Icon(
-              room.encrypted ? Icons.lock_outlined : Icons.lock_open_outlined,
+              room.encrypted ? Icons.lock_rounded : Icons.lock_open_rounded,
               size: 20,
               color: room.joinRules != JoinRules.public && !room.encrypted
                   ? Colors.red
                   : room.joinRules != JoinRules.public &&
                           snapshot.data ==
                               EncryptionHealthState.unverifiedDevices
-                      ? Colors.orange
+                      ? Colors.green
                       : null,
             ),
             onPressed: () => context.go('/rooms/${room.id}/encryption'),

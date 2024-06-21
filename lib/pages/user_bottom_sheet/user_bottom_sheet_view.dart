@@ -36,60 +36,7 @@ class UserBottomSheetView extends StatelessWidget {
             onPressed: Navigator.of(context, rootNavigator: false).pop,
           ),
           centerTitle: false,
-          title: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(displayname),
-              PresenceBuilder(
-                userId: userId,
-                client: client,
-                builder: (context, presence) {
-                  if (presence == null ||
-                      (presence.presence == PresenceType.offline &&
-                          presence.lastActiveTimestamp == null)) {
-                    return const SizedBox.shrink();
-                  }
-
-                  final dotColor = presence.presence.isOnline
-                      ? Colors.green
-                      : presence.presence.isUnavailable
-                          ? Colors.orange
-                          : Colors.grey;
-
-                  final lastActiveTimestamp = presence.lastActiveTimestamp;
-
-                  return Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        width: 8,
-                        height: 8,
-                        margin: const EdgeInsets.only(right: 8),
-                        decoration: BoxDecoration(
-                          color: dotColor,
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                      ),
-                      if (presence.currentlyActive == true)
-                        Text(
-                          L10n.of(context)!.currentlyActive,
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        )
-                      else if (lastActiveTimestamp != null)
-                        Text(
-                          L10n.of(context)!.lastActiveAgo(
-                            lastActiveTimestamp.localizedTimeShort(context),
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                          style: Theme.of(context).textTheme.bodySmall,
-                        ),
-                    ],
-                  );
-                },
-              ),
-            ],
-          ),
+          title: const SizedBox.shrink(),
           actions: [
             if (userId != client.userID &&
                 !client.ignoredUsers.contains(userId))
@@ -115,6 +62,31 @@ class UserBottomSheetView extends StatelessWidget {
           builder: (context, snapshot) {
             return ListView(
               children: [
+                Center(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Material(
+                      elevation: Theme.of(context)
+                              .appBarTheme
+                              .scrolledUnderElevation ??
+                          4,
+                      shadowColor: Theme.of(context).appBarTheme.shadowColor,
+                      shape: RoundedRectangleBorder(
+                        side: BorderSide(
+                          color: Theme.of(context).dividerColor,
+                        ),
+                        borderRadius: BorderRadius.circular(
+                          Avatar.defaultSize * 4,
+                        ),
+                      ),
+                      child: Avatar(
+                        mxContent: avatarUrl,
+                        name: displayname,
+                        size: Avatar.defaultSize * 4,
+                      ),
+                    ),
+                  ),
+                ),
                 if (user?.membership == Membership.knock)
                   Padding(
                     padding: const EdgeInsets.all(12.0),
@@ -167,75 +139,51 @@ class UserBottomSheetView extends StatelessWidget {
                   ),
                 Row(
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Material(
-                        elevation: Theme.of(context)
-                                .appBarTheme
-                                .scrolledUnderElevation ??
-                            4,
-                        shadowColor: Theme.of(context).appBarTheme.shadowColor,
-                        shape: RoundedRectangleBorder(
-                          side: BorderSide(
-                            color: Theme.of(context).dividerColor,
-                          ),
-                          borderRadius: BorderRadius.circular(
-                            Avatar.defaultSize * 2.5,
-                          ),
-                        ),
-                        child: Avatar(
-                          mxContent: avatarUrl,
-                          name: displayname,
-                          size: Avatar.defaultSize * 2.5,
-                        ),
-                      ),
-                    ),
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextButton.icon(
-                            onPressed: () => FluffyShare.share(
-                              'https://matrix.to/#/$userId',
-                              context,
-                            ),
-                            icon: Icon(
-                              Icons.adaptive.share_outlined,
-                              size: 16,
-                            ),
-                            style: TextButton.styleFrom(
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.onSurface,
-                            ),
-                            label: Text(
+                          Center(
+                            child: Text(
                               displayname,
+                              textAlign: TextAlign.center,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              //  style: const TextStyle(fontSize: 18),
+                              style: const TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          TextButton.icon(
-                            onPressed: () => FluffyShare.share(
-                              userId,
-                              context,
-                              copyOnly: true,
-                            ),
-                            icon: const Icon(
-                              Icons.copy_outlined,
-                              size: 14,
-                            ),
-                            style: TextButton.styleFrom(
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.secondary,
-                            ),
-                            label: Text(
-                              userId,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              //    style: const TextStyle(fontSize: 12),
-                            ),
-                          ),
+                          AppConfig.isTeacher
+                              ? Center(
+                                  child: TextButton.icon(
+                                    onPressed: () => FluffyShare.share(
+                                      userId,
+                                      context,
+                                      copyOnly: true,
+                                    ),
+                                    icon: const Icon(
+                                      Icons.copy_outlined,
+                                      size: 14,
+                                    ),
+                                    style: TextButton.styleFrom(
+                                      foregroundColor: Theme.of(context)
+                                          .colorScheme
+                                          .secondary,
+                                    ),
+                                    label: Text(
+                                      userId,
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      //    style: const TextStyle(fontSize: 12),
+                                    ),
+                                  ),
+                                )
+                              : const Padding(
+                                  padding: EdgeInsets.only(top: 10.0),
+                                ),
                         ],
                       ),
                     ),

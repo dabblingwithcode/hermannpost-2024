@@ -88,6 +88,7 @@ class EventVideoPlayerState extends State<EventVideoPlayer> {
 
   @override
   void dispose() {
+    _chewieManager?.videoPlayerController.pause();
     _chewieManager?.dispose();
     super.dispose();
   }

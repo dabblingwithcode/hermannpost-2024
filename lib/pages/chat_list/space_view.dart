@@ -433,13 +433,13 @@ class _SpaceViewState extends State<SpaceView> {
                       final spaceChild = spaceChildren[i];
                       final room = client.getRoomById(spaceChild.roomId);
                       if (room != null && !room.isSpace) {
-                        return ChatListItem(
-                          room,
-                          onLongPress: () =>
-                              _onSpaceChildContextMenu(spaceChild, room),
-                          activeChat: widget.controller.activeChat == room.id,
-                          onTap: () => onChatTap(room, context),
-                        );
+                        // return ChatListItem(
+                        //   room,
+                        //   onLongPress: () =>
+                        //       _onSpaceChildContextMenu(spaceChild, room),
+                        //   activeChat: widget.controller.activeChat == room.id,
+                        //   onTap: () => onChatTap(room, context),
+                        // );
                       }
                       final isSpace = spaceChild.roomType == 'm.space';
                       final topic = spaceChild.topic?.isEmpty ?? true

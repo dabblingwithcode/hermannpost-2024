@@ -3,23 +3,24 @@ import 'dart:ui';
 import 'package:matrix/matrix.dart';
 
 abstract class AppConfig {
-  static String _applicationName = 'FluffyChat';
+  static String _applicationName = 'Hermannpost';
   static String get applicationName => _applicationName;
   static String? _applicationWelcomeMessage;
   static String? get applicationWelcomeMessage => _applicationWelcomeMessage;
-  static String _defaultHomeserver = 'matrix.org';
+  static String _defaultHomeserver = 'post.hermannschule.de';
   static String get defaultHomeserver => _defaultHomeserver;
-  static double fontSizeFactor = 1;
+  static double fontSizeFactor = 1.2;
   static const Color chatColor = primaryColor;
   static Color? colorSchemeSeed = primaryColor;
   static const double messageFontSize = 15.75;
-  static const bool allowOtherHomeservers = true;
-  static const bool enableRegistration = true;
+  static const bool allowOtherHomeservers = false;
+  static const bool enableRegistration = false;
+  static bool isTeacher = false;
   static const Color primaryColor = Color(0xFF5625BA);
   static const Color primaryColorLight = Color(0xFFCCBDEA);
   static const Color secondaryColor = Color(0xFF41a2bc);
   static String _privacyUrl =
-      'https://github.com/krille-chan/fluffychat/blob/main/PRIVACY.md';
+      'https://hermannschule.de/hermannpost/datenschutz.html';
   static String get privacyUrl => _privacyUrl;
   static const String enablePushTutorial =
       'https://github.com/krille-chan/fluffychat/wiki/Push-Notifications-without-Google-Services';
@@ -27,24 +28,24 @@ abstract class AppConfig {
       'https://github.com/krille-chan/fluffychat/wiki/How-to-use-end-to-end-encryption-in-FluffyChat';
   static const String startChatTutorial =
       'https://github.com/krille-chan/fluffychat/wiki/How-to-Find-Users-in-FluffyChat';
-  static const String appId = 'im.fluffychat.FluffyChat';
+  static const String appId = 'de.hermannschule.hermannpost';
   static const String appOpenUrlScheme = 'im.fluffychat';
   static String _webBaseUrl = 'https://fluffychat.im/web';
   static String get webBaseUrl => _webBaseUrl;
   static const String sourceCodeUrl =
-      'https://github.com/krille-chan/fluffychat';
+      'https://github.com/hermanncoders/hermannpost';
   static const String supportUrl =
-      'https://github.com/krille-chan/fluffychat/issues';
+      'https://github.com/hermanncoders/hermannpost/issues';
   static final Uri newIssueUrl = Uri(
     scheme: 'https',
     host: 'github.com',
-    path: '/krille-chan/fluffychat/issues/new',
+    path: 'hermanncoders/hermannpost/issues/new',
   );
   static bool renderHtml = true;
-  static bool hideRedactedEvents = false;
+  static bool hideRedactedEvents = true;
   static bool hideUnknownEvents = true;
   static bool hideUnimportantStateEvents = true;
-  static bool separateChatTypes = false;
+  static bool separateChatTypes = true;
   static bool autoplayImages = true;
   static bool sendTypingNotifications = true;
   static bool sendPublicReadReceipts = true;
@@ -57,10 +58,13 @@ abstract class AppConfig {
   static const String inviteLinkPrefix = 'https://matrix.to/#/';
   static const String deepLinkPrefix = 'im.fluffychat://chat/';
   static const String schemePrefix = 'matrix:';
-  static const String pushNotificationsChannelId = 'fluffychat_push';
-  static const String pushNotificationsAppId = 'chat.fluffy.fluffychat';
+  static const String pushNotificationsChannelId = 'hermannpost-id';
+  static const String pushNotificationsChannelName = 'Hermannpost push channel';
+  static const String pushNotificationsChannelDescription =
+      'Push notifications for Hermannpost';
+  static const String pushNotificationsAppId = 'de.hermannschule.hermannpost';
   static const String pushNotificationsGatewayUrl =
-      'https://push.fluffychat.im/_matrix/push/v1/notify';
+      'https://post.hermannschule.de:7023/_matrix/push/v1/notify';
   static const String pushNotificationsPusherFormat = 'event_id_only';
   static const String emojiFontName = 'Noto Emoji';
   static const String emojiFontUrl =

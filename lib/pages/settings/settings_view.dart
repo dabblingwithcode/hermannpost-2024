@@ -21,21 +21,21 @@ class SettingsView extends StatelessWidget {
   Widget build(BuildContext context) {
     final showChatBackupBanner = controller.showChatBackupBanner;
     return Scaffold(
-      appBar: AppBar(
-        leading: Center(
-          child: CloseButton(
-            onPressed: () => context.go('/rooms'),
-          ),
-        ),
-        title: Text(L10n.of(context)!.settings),
-        actions: [
-          TextButton.icon(
-            onPressed: controller.logoutAction,
-            label: Text(L10n.of(context)!.logout),
-            icon: const Icon(Icons.logout_outlined),
-          ),
-        ],
-      ),
+      // appBar: AppBar(
+      //   leading: Center(
+      //     child: CloseButton(
+      //       onPressed: () => context.go('/rooms'),
+      //     ),
+      //   ),
+      //   title: Text(L10n.of(context)!.settings),
+      //   // actions: [
+      //   //   TextButton.icon(
+      //   //     onPressed: controller.logoutAction,
+      //   //     label: Text(L10n.of(context)!.logout),
+      //   //     icon: const Icon(Icons.logout_outlined),
+      //   //   ),
+      //   // ],
+      // ),
       body: ListTileTheme(
         iconColor: Theme.of(context).colorScheme.onSurface,
         child: ListView(
@@ -52,7 +52,7 @@ class SettingsView extends StatelessWidget {
                 return Row(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.all(32.0),
+                      padding: const EdgeInsets.all(16.0),
                       child: Stack(
                         children: [
                           Material(
@@ -78,12 +78,18 @@ class SettingsView extends StatelessWidget {
                           ),
                           if (profile != null)
                             Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: FloatingActionButton.small(
-                                onPressed: controller.setAvatarAction,
-                                heroTag: null,
-                                child: const Icon(Icons.camera_alt_outlined),
+                              bottom: -5,
+                              right: -5,
+                              child: InkWell(
+                                // onLongPress: () {
+                                //   controller.changeTeacherStatus();
+                                // },
+                                child: FloatingActionButton.small(
+                                  shape: const CircleBorder(),
+                                  onPressed: controller.setAvatarAction,
+                                  heroTag: null,
+                                  child: const Icon(Icons.camera_alt_outlined),
+                                ),
                               ),
                             ),
                         ],
@@ -94,39 +100,133 @@ class SettingsView extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          TextButton.icon(
-                            onPressed: controller.setDisplaynameAction,
-                            icon: const Icon(
-                              Icons.edit_outlined,
-                              size: 16,
+                          Text(
+                            displayname,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
                             ),
-                            style: TextButton.styleFrom(
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.onSurface,
-                            ),
-                            label: Text(
-                              displayname,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              //  style: const TextStyle(fontSize: 18),
-                            ),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            //  style: const TextStyle(fontSize: 18),
                           ),
-                          TextButton.icon(
-                            onPressed: () => FluffyShare.share(mxid, context),
-                            icon: const Icon(
-                              Icons.copy_outlined,
-                              size: 14,
-                            ),
-                            style: TextButton.styleFrom(
-                              foregroundColor:
-                                  Theme.of(context).colorScheme.secondary,
-                            ),
-                            label: Text(
-                              mxid,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              //    style: const TextStyle(fontSize: 12),
-                            ),
+                          // TextButton.icon(
+                          //   onPressed: () => FluffyShare.share(mxid, context),
+                          //   icon: const Icon(
+                          //     Icons.copy_outlined,
+                          //     size: 14,
+                          //   ),
+                          //   style: TextButton.styleFrom(
+                          //     foregroundColor:
+                          //         Theme.of(context).colorScheme.secondary,
+                          //   ),
+                          //   label: Text(
+                          //     mxid,
+                          //     maxLines: 1,
+                          //     overflow: TextOverflow.ellipsis,
+                          //     //    style: const TextStyle(fontSize: 12),
+                          //   ),
+                          // ),
+                          AppConfig.isTeacher
+                              ? TextButton.icon(
+                                  onPressed: () =>
+                                      FluffyShare.share(mxid, context),
+                                  icon: const Icon(
+                                    Icons.copy_outlined,
+                                    size: 14,
+                                  ),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor:
+                                        Theme.of(context).colorScheme.secondary,
+                                  ),
+                                  label: Text(
+                                    mxid,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    //    style: const TextStyle(fontSize: 12),
+                                  ),
+                                )
+                              : const SizedBox(
+                                  height: 10,
+                                ),
+                          Row(
+                            children: [
+                              if (AppConfig.isTeacher)
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 4.0),
+                                  child: Container(
+                                    width: 30.0,
+                                    height: 30.0,
+                                    decoration: const BoxDecoration(
+                                      color: Color.fromARGB(229, 232, 212, 253),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Center(
+                                      child: Icon(
+                                        Icons.school,
+                                        color: Colors.black,
+                                        size: 20,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              if (displayname.contains('(E)'))
+                                Container(
+                                  width: 30.0,
+                                  height: 30.0,
+                                  decoration: const BoxDecoration(
+                                    color: Color.fromARGB(229, 232, 212, 253),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.family_restroom_rounded,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              if (!displayname.contains('(E') &&
+                                  displayname.contains(')'))
+                                Container(
+                                  width: 30.0,
+                                  height: 30.0,
+                                  decoration: const BoxDecoration(
+                                    color: Color.fromARGB(229, 232, 212, 253),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Center(
+                                    child: Icon(
+                                      Icons.account_circle_rounded,
+                                      color: Colors.black,
+                                      size: 20,
+                                    ),
+                                  ),
+                                ),
+                              if (displayname.contains('(E)'))
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    'Elternkonto',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ),
+                              if (!displayname.contains('(E') &&
+                                  displayname.contains(')'))
+                                const Padding(
+                                  padding: EdgeInsets.only(left: 8.0),
+                                  child: Text(
+                                    'Hermannkind',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 18,
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ],
                       ),
@@ -134,6 +234,23 @@ class SettingsView extends StatelessWidget {
                   ],
                 );
               },
+            ),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              child: FloatingActionButton.extended(
+                backgroundColor: const Color.fromARGB(255, 223, 50, 50),
+                foregroundColor: Colors.white,
+                onPressed: controller.logoutAction,
+                label: Text(
+                  L10n.of(context)!.logout.toUpperCase(),
+                  style: const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                  ),
+                ),
+                icon: const Icon(Icons.logout_rounded),
+              ),
             ),
             Divider(
               height: 1,
@@ -175,12 +292,14 @@ class SettingsView extends StatelessWidget {
               onTap: () => context.go('/rooms/settings/devices'),
               trailing: const Icon(Icons.chevron_right_outlined),
             ),
-            ListTile(
-              leading: const Icon(Icons.forum_outlined),
-              title: Text(L10n.of(context)!.chat),
-              onTap: () => context.go('/rooms/settings/chat'),
-              trailing: const Icon(Icons.chevron_right_outlined),
-            ),
+            AppConfig.isTeacher == true
+                ? ListTile(
+                    leading: const Icon(Icons.forum_outlined),
+                    title: Text(L10n.of(context)!.chat),
+                    onTap: () => context.go('/rooms/settings/chat'),
+                    trailing: const Icon(Icons.chevron_right_outlined),
+                  )
+                : const SizedBox.shrink(),
             ListTile(
               leading: const Icon(Icons.shield_outlined),
               title: Text(L10n.of(context)!.security),

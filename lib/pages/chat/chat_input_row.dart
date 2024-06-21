@@ -153,7 +153,7 @@ class ChatInputRow extends StatelessWidget {
                             contentPadding: const EdgeInsets.all(0),
                           ),
                         ),
-                      if (PlatformInfos.isMobile)
+                      if (PlatformInfos.isMobile && AppConfig.isTeacher)
                         PopupMenuItem<String>(
                           value: 'camera-video',
                           child: ListTile(
@@ -166,19 +166,19 @@ class ChatInputRow extends StatelessWidget {
                             contentPadding: const EdgeInsets.all(0),
                           ),
                         ),
-                      if (PlatformInfos.isMobile)
-                        PopupMenuItem<String>(
-                          value: 'location',
-                          child: ListTile(
-                            leading: const CircleAvatar(
-                              backgroundColor: Colors.brown,
-                              foregroundColor: Colors.white,
-                              child: Icon(Icons.gps_fixed_outlined),
-                            ),
-                            title: Text(L10n.of(context)!.shareLocation),
-                            contentPadding: const EdgeInsets.all(0),
-                          ),
-                        ),
+                      // if (PlatformInfos.isMobile)
+                      //   PopupMenuItem<String>(
+                      //     value: 'location',
+                      //     child: ListTile(
+                      //       leading: const CircleAvatar(
+                      //         backgroundColor: Colors.brown,
+                      //         foregroundColor: Colors.white,
+                      //         child: Icon(Icons.gps_fixed_outlined),
+                      //       ),
+                      //       title: Text(L10n.of(context)!.shareLocation),
+                      //       contentPadding: const EdgeInsets.all(0),
+                      //     ),
+                      //   ),
                     ],
                   ),
                 ),

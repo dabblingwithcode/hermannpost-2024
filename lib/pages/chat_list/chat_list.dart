@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:fluffychat/utils/matrix_sdk_extensions/filtered_timeline_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,6 +12,7 @@ import 'package:flutter_shortcuts/flutter_shortcuts.dart';
 import 'package:future_loading_dialog/future_loading_dialog.dart';
 import 'package:go_router/go_router.dart';
 import 'package:matrix/matrix.dart';
+import 'package:matrix/matrix_api_lite.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'package:uni_links/uni_links.dart';
 
@@ -50,8 +52,8 @@ enum PopupMenuAction {
 enum ActiveFilter {
   allChats,
   groups,
-  messages,
-  spaces,
+  //messages,
+  settings,
 }
 
 class ChatList extends StatefulWidget {
@@ -94,7 +96,7 @@ class ChatListController extends State<ChatList>
     setState(() {
       selectedRoomIds.clear();
       activeSpaceId = spaceId;
-      activeFilter = ActiveFilter.spaces;
+      activeFilter = ActiveFilter.settings;
     });
   }
 
@@ -108,43 +110,47 @@ class ChatListController extends State<ChatList>
   int get selectedIndex {
     switch (activeFilter) {
       case ActiveFilter.allChats:
-      case ActiveFilter.messages:
+        //case ActiveFilter.messages:
         return 0;
       case ActiveFilter.groups:
         return 1;
-      case ActiveFilter.spaces:
+      case ActiveFilter.settings:
         return AppConfig.separateChatTypes ? 2 : 1;
     }
   }
 
   ActiveFilter getActiveFilterByDestination(int? i) {
     switch (i) {
-      case 1:
-        if (AppConfig.separateChatTypes) {
-          return ActiveFilter.groups;
-        }
-        return ActiveFilter.spaces;
       case 2:
-        return ActiveFilter.spaces;
+        return ActiveFilter.settings;
+      case 1:
+        return ActiveFilter.groups;
       case 0:
       default:
-        if (AppConfig.separateChatTypes) {
-          return ActiveFilter.messages;
-        }
         return ActiveFilter.allChats;
     }
   }
 
   void onDestinationSelected(int? i) {
-    setState(() {
-      selectedRoomIds.clear();
-      activeFilter = getActiveFilterByDestination(i);
-    });
+    if (i == 2) {
+      setState(() {
+        activeFilter = ActiveFilter.settings;
+      });
+
+      // context.push('/rooms/settings');
+    } else if (i == 1) {
+      setState(() {
+        activeFilter = ActiveFilter.groups;
+      });
+    } else {
+      setState(() {
+        selectedRoomIds.clear();
+        activeFilter = getActiveFilterByDestination(i);
+      });
+    }
   }
 
-  ActiveFilter activeFilter = AppConfig.separateChatTypes
-      ? ActiveFilter.messages
-      : ActiveFilter.allChats;
+  ActiveFilter activeFilter = ActiveFilter.allChats;
 
   bool Function(Room) getRoomFilterByActiveFilter(ActiveFilter activeFilter) {
     switch (activeFilter) {
@@ -152,9 +158,9 @@ class ChatListController extends State<ChatList>
         return (room) => !room.isSpace;
       case ActiveFilter.groups:
         return (room) => !room.isSpace && !room.isDirectChat;
-      case ActiveFilter.messages:
-        return (room) => !room.isSpace && room.isDirectChat;
-      case ActiveFilter.spaces:
+      // case ActiveFilter.messages:
+      //   return (room) => !room.isSpace && room.isDirectChat;
+      case ActiveFilter.settings:
         return (r) => r.isSpace;
     }
   }
@@ -171,6 +177,7 @@ class ChatListController extends State<ChatList>
   Timer? _coolDown;
   SearchUserDirectoryResponse? userSearchResult;
   QueryPublicRoomsResponse? roomSearchResult;
+  //QueryPublicRoomsResponse? allPublicRoomsResult;
 
   bool isSearching = false;
   static const String _serverStoreNamespace = 'im.fluffychat.search.server';
@@ -207,6 +214,31 @@ class ChatListController extends State<ChatList>
   final TextEditingController searchController = TextEditingController();
   final FocusNode searchFocusNode = FocusNode();
 
+  void getPublicRooms() async {
+    final client = Matrix.of(context).client;
+
+    QueryPublicRoomsResponse? allPublicRooms;
+    try {
+      allPublicRooms = await client.queryPublicRooms(
+        server: searchServer,
+        //filter: PublicRoomQueryFilter(genericSearchTerm: searchController.text),
+        limit: 40,
+      );
+    } catch (e, s) {
+      Logs().w('Room fetching has crashed', e, s);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            'Room fetching has crashed ${e.toLocalizedString(context)}',
+          ),
+        ),
+      );
+    }
+    setState(() {
+      roomSearchResult = allPublicRooms;
+    });
+  }
+
   void _search() async {
     final client = Matrix.of(context).client;
     if (!isSearching) {
@@ -214,11 +246,11 @@ class ChatListController extends State<ChatList>
         isSearching = true;
       });
     }
-    SearchUserDirectoryResponse? userSearchResult;
-    QueryPublicRoomsResponse? roomSearchResult;
+    // SearchUserDirectoryResponse? userSearchResult;
+    QueryPublicRoomsResponse? allRoomsSearchResult;
     final searchQuery = searchController.text.trim();
     try {
-      roomSearchResult = await client.queryPublicRooms(
+      allRoomsSearchResult = await client.queryPublicRooms(
         server: searchServer,
         filter: PublicRoomQueryFilter(genericSearchTerm: searchQuery),
         limit: 20,
@@ -226,13 +258,13 @@ class ChatListController extends State<ChatList>
 
       if (searchQuery.isValidMatrixId &&
           searchQuery.sigil == '#' &&
-          roomSearchResult.chunk
+          allRoomsSearchResult.chunk
                   .any((room) => room.canonicalAlias == searchQuery) ==
               false) {
         final response = await client.getRoomIdByAlias(searchQuery);
         final roomId = response.roomId;
         if (roomId != null) {
-          roomSearchResult.chunk.add(
+          allRoomsSearchResult.chunk.add(
             PublicRoomsChunk(
               name: searchQuery,
               guestCanJoin: false,
@@ -244,10 +276,10 @@ class ChatListController extends State<ChatList>
           );
         }
       }
-      userSearchResult = await client.searchUserDirectory(
-        searchController.text,
-        limit: 20,
-      );
+      // userSearchResult = await client.searchUserDirectory(
+      //   searchController.text,
+      //   limit: 20,
+      // );
     } catch (e, s) {
       Logs().w('Searching has crashed', e, s);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -261,8 +293,8 @@ class ChatListController extends State<ChatList>
     if (!isSearchMode) return;
     setState(() {
       isSearching = false;
-      this.roomSearchResult = roomSearchResult;
-      this.userSearchResult = userSearchResult;
+      roomSearchResult = allRoomsSearchResult;
+      // this.userSearchResult = userSearchResult;
     });
   }
 
@@ -674,9 +706,7 @@ class ChatListController extends State<ChatList>
   void setActiveClient(Client client) {
     context.go('/rooms');
     setState(() {
-      activeFilter = AppConfig.separateChatTypes
-          ? ActiveFilter.messages
-          : ActiveFilter.allChats;
+      activeFilter = ActiveFilter.allChats;
       activeSpaceId = null;
       selectedRoomIds.clear();
       Matrix.of(context).setActiveClient(client);

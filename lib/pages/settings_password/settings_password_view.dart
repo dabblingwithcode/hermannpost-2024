@@ -22,69 +22,31 @@ class SettingsPasswordView extends StatelessWidget {
           ),
         ],
       ),
-      body: ListTileTheme(
-        iconColor: Theme.of(context).colorScheme.onSurface,
-        child: MaxWidthBody(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              children: [
-                Center(
-                  child: Icon(
-                    Icons.key_outlined,
-                    color: Theme.of(context).dividerColor,
-                    size: 80,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: controller.oldPasswordController,
-                  obscureText: true,
-                  autocorrect: false,
-                  autofocus: true,
-                  readOnly: controller.loading,
-                  decoration: InputDecoration(
-                    hintText: L10n.of(context)!.pleaseEnterYourCurrentPassword,
-                    errorText: controller.oldPasswordError,
-                  ),
-                ),
-                const Divider(height: 32),
-                TextField(
-                  controller: controller.newPassword1Controller,
-                  obscureText: true,
-                  autocorrect: false,
-                  readOnly: controller.loading,
-                  decoration: InputDecoration(
-                    hintText: L10n.of(context)!.newPassword,
-                    errorText: controller.newPassword1Error,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  controller: controller.newPassword2Controller,
-                  obscureText: true,
-                  autocorrect: false,
-                  readOnly: controller.loading,
-                  decoration: InputDecoration(
-                    hintText: L10n.of(context)!.repeatPassword,
-                    errorText: controller.newPassword2Error,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed:
-                        controller.loading ? null : controller.changePassword,
-                    icon: const Icon(Icons.send_outlined),
-                    label: controller.loading
-                        ? const LinearProgressIndicator()
-                        : Text(L10n.of(context)!.changePassword),
-                  ),
-                ),
-              ],
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            const SizedBox(height: 16),
+            Image.asset('assets/hermannkey.png'),
+            const Text(
+              'Bitte QR-Schlüssel bereit halten!',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
             ),
-          ),
+            const Spacer(),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed:
+                    controller.loading ? null : controller.changePassword,
+                icon: const Icon(Icons.send_outlined),
+                label: controller.loading
+                    ? const LinearProgressIndicator()
+                    : Text(L10n.of(context)!.changePassword),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -55,7 +55,7 @@ class ChatDetailsView extends StatelessWidget {
                 const Center(child: BackButton()),
             elevation: Theme.of(context).appBarTheme.elevation,
             actions: <Widget>[
-              if (room.canonicalAlias.isNotEmpty)
+              if (room.canonicalAlias.isNotEmpty && AppConfig.isTeacher)
                 IconButton(
                   tooltip: L10n.of(context)!.share,
                   icon: Icon(Icons.adaptive.share_outlined),
@@ -137,40 +137,15 @@ class ChatDetailsView extends StatelessWidget {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  TextButton.icon(
-                                    onPressed: () => room.isDirectChat
-                                        ? null
-                                        : room.canChangeStateEvent(
-                                            EventTypes.RoomName,
-                                          )
-                                            ? controller.setDisplaynameAction()
-                                            : FluffyShare.share(
-                                                displayname,
-                                                context,
-                                                copyOnly: true,
-                                              ),
-                                    icon: Icon(
-                                      room.isDirectChat
-                                          ? Icons.chat_bubble_outline
-                                          : room.canChangeStateEvent(
-                                              EventTypes.RoomName,
-                                            )
-                                              ? Icons.edit_outlined
-                                              : Icons.copy_outlined,
-                                      size: 16,
-                                    ),
-                                    style: TextButton.styleFrom(
-                                      foregroundColor: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface,
-                                    ),
-                                    label: Text(
-                                      room.isDirectChat
-                                          ? L10n.of(context)!.directChat
-                                          : displayname,
-                                      maxLines: 1,
-                                      overflow: TextOverflow.ellipsis,
-                                      //  style: const TextStyle(fontSize: 18),
+                                  Text(
+                                    room.isDirectChat
+                                        ? L10n.of(context)!.directChat
+                                        : displayname,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   TextButton.icon(
@@ -265,22 +240,23 @@ class ChatDetailsView extends StatelessWidget {
                           height: 1,
                           color: Theme.of(context).dividerColor,
                         ),
-                        ListTile(
-                          leading: CircleAvatar(
-                            backgroundColor:
-                                Theme.of(context).scaffoldBackgroundColor,
-                            foregroundColor: iconColor,
-                            child: const Icon(
-                              Icons.insert_emoticon_outlined,
+                        if (AppConfig.isTeacher)
+                          ListTile(
+                            leading: CircleAvatar(
+                              backgroundColor:
+                                  Theme.of(context).scaffoldBackgroundColor,
+                              foregroundColor: iconColor,
+                              child: const Icon(
+                                Icons.insert_emoticon_outlined,
+                              ),
                             ),
+                            title:
+                                Text(L10n.of(context)!.customEmojisAndStickers),
+                            subtitle: Text(L10n.of(context)!.setCustomEmotes),
+                            onTap: controller.goToEmoteSettings,
+                            trailing: const Icon(Icons.chevron_right_outlined),
                           ),
-                          title:
-                              Text(L10n.of(context)!.customEmojisAndStickers),
-                          subtitle: Text(L10n.of(context)!.setCustomEmotes),
-                          onTap: controller.goToEmoteSettings,
-                          trailing: const Icon(Icons.chevron_right_outlined),
-                        ),
-                        if (!room.isDirectChat)
+                        if (!room.isDirectChat && AppConfig.isTeacher)
                           ListTile(
                             leading: CircleAvatar(
                               backgroundColor:
@@ -298,7 +274,7 @@ class ChatDetailsView extends StatelessWidget {
                                 .push('/rooms/${room.id}/details/access'),
                             trailing: const Icon(Icons.chevron_right_outlined),
                           ),
-                        if (!room.isDirectChat)
+                        if (!room.isDirectChat && AppConfig.isTeacher)
                           ListTile(
                             title: Text(L10n.of(context)!.chatPermissions),
                             subtitle: Text(
@@ -331,6 +307,74 @@ class ChatDetailsView extends StatelessWidget {
                             ),
                           ),
                         ),
+                        AppConfig.isTeacher && controller.powerlevel >= 10
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                  left: 14.0,
+                                  right: 14.0,
+                                  bottom: 14,
+                                ),
+                                child: SizedBox(
+                                  height: 44,
+                                  child: TextField(
+                                    onTap: () =>
+                                        {}, // controller.requestMoreMembersAction()
+                                    controller: controller.searchController,
+                                    textInputAction: TextInputAction.search,
+                                    onChanged: controller.onSearchEnter,
+                                    decoration: InputDecoration(
+                                      border: UnderlineInputBorder(
+                                        borderSide: BorderSide.none,
+                                        borderRadius: BorderRadius.circular(
+                                          AppConfig.borderRadius,
+                                        ),
+                                      ),
+                                      hintText: L10n.of(context)!.search,
+                                      floatingLabelBehavior:
+                                          FloatingLabelBehavior.never,
+                                      prefixIcon: controller.isSearchMode
+                                          ? IconButton(
+                                              tooltip: L10n.of(context)!.cancel,
+                                              icon: const Icon(
+                                                Icons.close_outlined,
+                                              ),
+                                              onPressed:
+                                                  controller.cancelSearch,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            )
+                                          : Icon(
+                                              Icons.search_outlined,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .onSurface,
+                                            ),
+                                      suffixIcon: controller.isSearchMode
+                                          ? controller.isSearching
+                                              ? const Padding(
+                                                  padding: EdgeInsets.symmetric(
+                                                    vertical: 10.0,
+                                                    horizontal: 12,
+                                                  ),
+                                                  child: SizedBox.square(
+                                                    dimension: 24,
+                                                    child:
+                                                        CircularProgressIndicator
+                                                            .adaptive(
+                                                      strokeWidth: 2,
+                                                    ),
+                                                  ),
+                                                )
+                                              : const SizedBox.shrink()
+                                          : const SizedBox(
+                                              width: 0,
+                                            ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : const SizedBox.shrink(),
                         if (!room.isDirectChat && room.canInvite)
                           ListTile(
                             title: Text(L10n.of(context)!.inviteContact),
@@ -349,27 +393,35 @@ class ChatDetailsView extends StatelessWidget {
                           ),
                       ],
                     )
-                  : i < members.length + 1
-                      ? ParticipantListItem(members[i - 1])
-                      : ListTile(
-                          title: Text(
-                            L10n.of(context)!.loadCountMoreParticipants(
-                              (actualMembersCount - members.length).toString(),
-                            ),
-                          ),
-                          leading: CircleAvatar(
-                            backgroundColor:
-                                Theme.of(context).scaffoldBackgroundColor,
-                            child: const Icon(
-                              Icons.group_outlined,
-                              color: Colors.grey,
-                            ),
-                          ),
-                          onTap: () => context.push(
-                            '/rooms/${controller.roomId!}/details/members',
-                          ),
-                          trailing: const Icon(Icons.chevron_right_outlined),
-                        ),
+                  : AppConfig.isTeacher == true &&
+                          controller.powerlevel >= 10 &&
+                          i < controller.filteredMembers!.length + 1
+                      ? ParticipantListItem(
+                          controller.filteredMembers![i - 1],
+                        )
+                      : AppConfig.isTeacher == true &&
+                              controller.powerlevel >= 30
+                          ? ListTile(
+                              title: Text(
+                                L10n.of(context)!.loadCountMoreParticipants(
+                                  (actualMembersCount -
+                                          controller.filteredMembers!.length)
+                                      .toString(),
+                                ),
+                              ),
+                              leading: CircleAvatar(
+                                backgroundColor:
+                                    Theme.of(context).scaffoldBackgroundColor,
+                                child: const Icon(
+                                  Icons.refresh,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                              onTap: () => context.push(
+                                '/rooms/${controller.roomId!}/details/members',
+                              ),
+                            )
+                          : const SizedBox.shrink(),
             ),
           ),
         );

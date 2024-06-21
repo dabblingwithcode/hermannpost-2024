@@ -200,6 +200,7 @@ class HomeserverPickerController extends State<HomeserverPicker> {
   void login() => context.push(
         '${GoRouter.of(context).routeInformationProvider.value.uri.path}/login',
       );
+  void qrLogin() => context.push('/qr_login');
 
   @override
   void initState() {

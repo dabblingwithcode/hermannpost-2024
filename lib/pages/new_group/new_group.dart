@@ -64,8 +64,11 @@ class NewGroupController extends State<NewGroup> {
       if (!mounted) return;
 
       final roomId = await client.createGroupChat(
-        visibility:
-            publicGroup ? sdk.Visibility.public : sdk.Visibility.private,
+        visibility: sdk.Visibility.private,
+        //hp all public groups are moderated
+        // publicGroup ? sdk.Visibility.public : sdk.Visibility.private,
+        enableEncryption: true,
+        // we want staff to use encrypted rooms
         preset: publicGroup
             ? sdk.CreateRoomPreset.publicChat
             : sdk.CreateRoomPreset.privateChat,

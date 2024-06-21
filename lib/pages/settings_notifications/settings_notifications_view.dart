@@ -1,3 +1,4 @@
+import 'package:fluffychat/config/app_config.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
@@ -64,57 +65,60 @@ class SettingsNotificationsView extends StatelessWidget {
                             : (bool enabled) => controller
                                 .setNotificationSetting(item, enabled),
                   ),
-                Divider(color: Theme.of(context).dividerColor),
-                ListTile(
-                  title: Text(
-                    L10n.of(context)!.devices,
-                    style: TextStyle(
-                      color: Theme.of(context).colorScheme.secondary,
-                      fontWeight: FontWeight.bold,
+                if (AppConfig.isTeacher)
+                  Divider(color: Theme.of(context).dividerColor),
+                if (AppConfig.isTeacher)
+                  ListTile(
+                    title: Text(
+                      L10n.of(context)!.devices,
+                      style: TextStyle(
+                        color: Theme.of(context).colorScheme.secondary,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
-                ),
-                FutureBuilder<List<Pusher>?>(
-                  future: controller.pusherFuture ??=
-                      Matrix.of(context).client.getPushers(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      Center(
-                        child: Text(
-                          snapshot.error!.toLocalizedString(context),
+                if (AppConfig.isTeacher)
+                  FutureBuilder<List<Pusher>?>(
+                    future: controller.pusherFuture ??=
+                        Matrix.of(context).client.getPushers(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        Center(
+                          child: Text(
+                            snapshot.error!.toLocalizedString(context),
+                          ),
+                        );
+                      }
+                      if (snapshot.connectionState != ConnectionState.done) {
+                        const Center(
+                          child: CircularProgressIndicator.adaptive(
+                            strokeWidth: 2,
+                          ),
+                        );
+                      }
+                      final pushers = snapshot.data ?? [];
+                      if (pushers.isEmpty) {
+                        return Center(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 16.0),
+                            child: Text(L10n.of(context)!.noOtherDevicesFound),
+                          ),
+                        );
+                      }
+                      return ListView.builder(
+                        physics: const NeverScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: pushers.length,
+                        itemBuilder: (_, i) => ListTile(
+                          title: Text(
+                            '${pushers[i].appDisplayName} - ${pushers[i].appId}',
+                          ),
+                          subtitle: Text(pushers[i].data.url.toString()),
+                          onTap: () => controller.onPusherTap(pushers[i]),
                         ),
                       );
-                    }
-                    if (snapshot.connectionState != ConnectionState.done) {
-                      const Center(
-                        child: CircularProgressIndicator.adaptive(
-                          strokeWidth: 2,
-                        ),
-                      );
-                    }
-                    final pushers = snapshot.data ?? [];
-                    if (pushers.isEmpty) {
-                      return Center(
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 16.0),
-                          child: Text(L10n.of(context)!.noOtherDevicesFound),
-                        ),
-                      );
-                    }
-                    return ListView.builder(
-                      physics: const NeverScrollableScrollPhysics(),
-                      shrinkWrap: true,
-                      itemCount: pushers.length,
-                      itemBuilder: (_, i) => ListTile(
-                        title: Text(
-                          '${pushers[i].appDisplayName} - ${pushers[i].appId}',
-                        ),
-                        subtitle: Text(pushers[i].data.url.toString()),
-                        onTap: () => controller.onPusherTap(pushers[i]),
-                      ),
-                    );
-                  },
-                ),
+                    },
+                  ),
               ],
             );
           },

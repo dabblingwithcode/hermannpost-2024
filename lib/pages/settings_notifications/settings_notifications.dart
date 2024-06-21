@@ -41,16 +41,16 @@ class NotificationSettingsItem {
       '.m.rule.invite_for_me',
       (c) => L10n.of(c)!.inviteForMe,
     ),
-    NotificationSettingsItem(
-      PushRuleKind.override,
-      '.m.rule.member_event',
-      (c) => L10n.of(c)!.memberChanges,
-    ),
-    NotificationSettingsItem(
-      PushRuleKind.override,
-      '.m.rule.suppress_notices',
-      (c) => L10n.of(c)!.botMessages,
-    ),
+    // NotificationSettingsItem(
+    //   PushRuleKind.override,
+    //   '.m.rule.member_event',
+    //   (c) => L10n.of(c)!.memberChanges,
+    // ),
+    // NotificationSettingsItem(
+    //   PushRuleKind.override,
+    //   '.m.rule.suppress_notices',
+    //   (c) => L10n.of(c)!.botMessages,
+    // ),
   ];
 }
 

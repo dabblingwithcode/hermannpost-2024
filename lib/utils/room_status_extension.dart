@@ -1,3 +1,4 @@
+import 'package:fluffychat/utils/matrix_sdk_extensions/filtered_timeline_extension.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
@@ -37,22 +38,51 @@ extension RoomStatusExtension on Room {
     return typingText;
   }
 
-  List<User> getSeenByUsers(Timeline timeline, {String? eventId}) {
+  List<Receipt> getSeenByUsers(Timeline timeline, {String? eventId}) {
     if (timeline.events.isEmpty) return [];
-    eventId ??= timeline.events.first.eventId;
-
+    final List<Event> seenEvents = [];
+    for (final event in timeline.events) {
+      if (!event.isState) {
+        seenEvents.add(event);
+      }
+    }
+    if (seenEvents.isNotEmpty) {
+      eventId ??= seenEvents.first.eventId;
+    }
     final lastReceipts = <User>{};
+    final seenReceipts = <Receipt>{};
     // now we iterate the timeline events until we hit the first rendered event
+
     for (final event in timeline.events) {
       lastReceipts.addAll(event.receipts.map((r) => r.user));
+      seenReceipts.addAll(event.receipts);
+      if (event.receipts.isNotEmpty) {
+        for (final receipt in event.receipts) {
+          debugPrint(
+            'seen by ${receipt.user.displayName}  at ${receipt.time.toString()}',
+          );
+        }
+      }
+
       if (event.eventId == eventId) {
         break;
       }
     }
     lastReceipts.removeWhere(
       (user) =>
-          user.id == client.userID || user.id == timeline.events.first.senderId,
+          user.id == client.userID ||
+          user.id == timeline.events.first.senderId ||
+          user.displayName == null,
     );
-    return lastReceipts.toList();
+    seenReceipts.removeWhere(
+      (element) =>
+          element.user.id == client.userID ||
+          element.user.id == timeline.events.first.senderId ||
+          element.user.displayName == null,
+    );
+    //return lastReceipts.toList();
+    final sortedReceipts = seenReceipts.toList();
+    sortedReceipts.sort((item1, item2) => item1.time.compareTo(item2.time));
+    return sortedReceipts;
   }
 }

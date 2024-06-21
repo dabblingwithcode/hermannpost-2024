@@ -1,8 +1,8 @@
-/*package chat.fluffy.fluffychat
+package de.hermannschule.hermannpost
 
 import com.famedly.fcm_shared_isolate.FcmSharedIsolateService
 
-import chat.fluffy.fluffychat.MainActivity
+import de.hermannschule.hermannpost.MainActivity
 
 import io.flutter.embedding.android.FlutterActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -33,4 +33,3 @@ class FcmPushService : FcmSharedIsolateService() {
         }
     }
 }
-*/

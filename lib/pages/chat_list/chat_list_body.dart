@@ -1,3 +1,5 @@
+import 'package:fluffychat/pages/settings/settings.dart';
+import 'package:fluffychat/widgets/theme_builder.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -29,13 +31,16 @@ class ChatListViewBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    controller.getPublicRooms();
+
+    final roomSearchResult = controller.roomSearchResult;
     final publicRooms = controller.roomSearchResult?.chunk
         .where((room) => room.roomType != 'm.space')
         .toList();
-    final publicSpaces = controller.roomSearchResult?.chunk
-        .where((room) => room.roomType == 'm.space')
-        .toList();
-    final userSearchResult = controller.userSearchResult;
+    // final publicSpaces = controller.roomSearchResult?.chunk
+    //     .where((room) => room.roomType == 'm.space')
+    //     .toList();
+    // final userSearchResult = controller.userSearchResult;
     final client = Matrix.of(context).client;
     const dummyChatCount = 4;
     final titleColor =
@@ -67,13 +72,13 @@ class ChatListViewBody extends StatelessWidget {
             .where((s) => s.hasRoomUpdate)
             .rateLimit(const Duration(seconds: 1)),
         builder: (context, _) {
-          if (controller.activeFilter == ActiveFilter.spaces) {
-            return SpaceView(
-              controller,
-              scrollController: controller.scrollController,
-              key: Key(controller.activeSpaceId ?? 'Spaces'),
-            );
-          }
+          // if (controller.activeFilter == ActiveFilter.spaces) {
+          //   return SpaceView(
+          //     controller,
+          //     scrollController: controller.scrollController,
+          //     key: Key(controller.activeSpaceId ?? 'Spaces'),
+          //   );
+          // }
           final rooms = controller.filteredRooms;
           return SafeArea(
             child: CustomScrollView(
@@ -84,85 +89,86 @@ class ChatListViewBody extends StatelessWidget {
                   delegate: SliverChildListDelegate(
                     [
                       if (controller.isSearchMode) ...[
-                        SearchTitle(
-                          title: L10n.of(context)!.publicRooms,
-                          icon: const Icon(Icons.explore_outlined),
-                        ),
-                        PublicRoomsHorizontalList(publicRooms: publicRooms),
-                        SearchTitle(
-                          title: L10n.of(context)!.publicSpaces,
-                          icon: const Icon(Icons.workspaces_outlined),
-                        ),
-                        PublicRoomsHorizontalList(publicRooms: publicSpaces),
-                        SearchTitle(
-                          title: L10n.of(context)!.users,
-                          icon: const Icon(Icons.group_outlined),
-                        ),
-                        AnimatedContainer(
-                          clipBehavior: Clip.hardEdge,
-                          decoration: const BoxDecoration(),
-                          height: userSearchResult == null ||
-                                  userSearchResult.results.isEmpty
-                              ? 0
-                              : 106,
-                          duration: FluffyThemes.animationDuration,
-                          curve: FluffyThemes.animationCurve,
-                          child: userSearchResult == null
-                              ? null
-                              : ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: userSearchResult.results.length,
-                                  itemBuilder: (context, i) => _SearchItem(
-                                    title: userSearchResult
-                                            .results[i].displayName ??
-                                        userSearchResult
-                                            .results[i].userId.localpart ??
-                                        L10n.of(context)!.unknownDevice,
-                                    avatar:
-                                        userSearchResult.results[i].avatarUrl,
-                                    onPressed: () => showAdaptiveBottomSheet(
-                                      context: context,
-                                      builder: (c) => UserBottomSheet(
-                                        profile: userSearchResult.results[i],
-                                        outerContext: context,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                        ),
+                        //hp don't show public rooms here since there is a view for this
+                        // SearchTitle(
+                        //   title: L10n.of(context)!.publicRooms,
+                        //   icon: const Icon(Icons.explore_outlined),
+                        // ),
+                        // PublicRoomsHorizontalList(publicRooms: publicRooms),
+                        // SearchTitle(
+                        //   title: L10n.of(context)!.publicSpaces,
+                        //   icon: const Icon(Icons.workspaces_outlined),
+                        // ),
+                        // PublicRoomsHorizontalList(publicRooms: publicSpaces),
+                        // SearchTitle(
+                        //   title: L10n.of(context)!.users,
+                        //   icon: const Icon(Icons.group_outlined),
+                        // ),
+                        // AnimatedContainer(
+                        //   clipBehavior: Clip.hardEdge,
+                        //   decoration: const BoxDecoration(),
+                        //   height: userSearchResult == null ||
+                        //           userSearchResult.results.isEmpty
+                        //       ? 0
+                        //       : 106,
+                        //   duration: FluffyThemes.animationDuration,
+                        //   curve: FluffyThemes.animationCurve,
+                        //   child: userSearchResult == null
+                        //       ? null
+                        //       : ListView.builder(
+                        //           scrollDirection: Axis.horizontal,
+                        //           itemCount: userSearchResult.results.length,
+                        //           itemBuilder: (context, i) => _SearchItem(
+                        //             title: userSearchResult
+                        //                     .results[i].displayName ??
+                        //                 userSearchResult
+                        //                     .results[i].userId.localpart ??
+                        //                 L10n.of(context)!.unknownDevice,
+                        //             avatar:
+                        //                 userSearchResult.results[i].avatarUrl,
+                        //             onPressed: () => showAdaptiveBottomSheet(
+                        //               context: context,
+                        //               builder: (c) => UserBottomSheet(
+                        //                 profile: userSearchResult.results[i],
+                        //                 outerContext: context,
+                        //               ),
+                        //             ),
+                        //           ),
+                        //         ),
+                        // ),
                       ],
-                      if (!controller.isSearchMode &&
-                          controller.activeFilter != ActiveFilter.groups &&
-                          AppConfig.showPresences)
-                        GestureDetector(
-                          onLongPress: () => controller.dismissStatusList(),
-                          child: StatusMessageList(
-                            onStatusEdit: controller.setStatus,
-                          ),
-                        ),
-                      const ConnectionStatusHeader(),
-                      AnimatedContainer(
-                        height: controller.isTorBrowser ? 64 : 0,
-                        duration: FluffyThemes.animationDuration,
-                        curve: FluffyThemes.animationCurve,
-                        clipBehavior: Clip.hardEdge,
-                        decoration: const BoxDecoration(),
-                        child: Material(
-                          color: Theme.of(context).colorScheme.surface,
-                          child: ListTile(
-                            leading: const Icon(Icons.vpn_key),
-                            title: Text(L10n.of(context)!.dehydrateTor),
-                            subtitle: Text(L10n.of(context)!.dehydrateTorLong),
-                            trailing: const Icon(Icons.chevron_right_outlined),
-                            onTap: controller.dehydrate,
-                          ),
-                        ),
-                      ),
-                      if (controller.isSearchMode)
-                        SearchTitle(
-                          title: L10n.of(context)!.chats,
-                          icon: const Icon(Icons.forum_outlined),
-                        ),
+                      // if (!controller.isSearchMode &&
+                      //     controller.activeFilter != ActiveFilter.groups &&
+                      //     AppConfig.showPresences)
+                      //   GestureDetector(
+                      //     onLongPress: () => controller.dismissStatusList(),
+                      //     child: StatusMessageList(
+                      //       onStatusEdit: controller.setStatus,
+                      //     ),
+                      //   ),
+                      // const ConnectionStatusHeader(),
+                      // AnimatedContainer(
+                      //   height: controller.isTorBrowser ? 64 : 0,
+                      //   duration: FluffyThemes.animationDuration,
+                      //   curve: FluffyThemes.animationCurve,
+                      //   clipBehavior: Clip.hardEdge,
+                      //   decoration: const BoxDecoration(),
+                      //   child: Material(
+                      //     color: Theme.of(context).colorScheme.surface,
+                      //     child: ListTile(
+                      //       leading: const Icon(Icons.vpn_key),
+                      //       title: Text(L10n.of(context)!.dehydrateTor),
+                      //       subtitle: Text(L10n.of(context)!.dehydrateTorLong),
+                      //       trailing: const Icon(Icons.chevron_right_outlined),
+                      //       onTap: controller.dehydrate,
+                      //     ),
+                      //   ),
+                      // ),
+                      //if (controller.isSearchMode)
+                      // SearchTitle(
+                      //   title: L10n.of(context)!.chats,
+                      //   icon: const Icon(Icons.forum_outlined),
+                      // ),
                       if (client.prevBatch != null &&
                           rooms.isEmpty &&
                           !controller.isSearchMode) ...[
@@ -179,7 +185,8 @@ class ChatListViewBody extends StatelessWidget {
                     ],
                   ),
                 ),
-                if (client.prevBatch == null)
+                if (client.prevBatch == null &&
+                    controller.activeFilter == ActiveFilter.allChats)
                   SliverList(
                     delegate: SliverChildBuilderDelegate(
                       (context, i) => Opacity(
@@ -237,7 +244,8 @@ class ChatListViewBody extends StatelessWidget {
                       childCount: dummyChatCount,
                     ),
                   ),
-                if (client.prevBatch != null)
+                if (client.prevBatch != null &&
+                    controller.activeFilter == ActiveFilter.allChats)
                   SliverList.builder(
                     itemCount: rooms.length,
                     itemBuilder: (BuildContext context, int i) {
@@ -256,6 +264,68 @@ class ChatListViewBody extends StatelessWidget {
                       );
                     },
                   ),
+                if (controller.activeFilter == ActiveFilter.groups)
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                      GridView.builder(
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        padding: const EdgeInsets.all(12),
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          childAspectRatio: 1,
+                          crossAxisSpacing: 16,
+                          mainAxisSpacing: 16,
+                        ),
+                        itemCount: roomSearchResult!.chunk.length,
+                        itemBuilder: (context, i) => _SearchPublicRoomItem(
+                          title: roomSearchResult.chunk[i].name ??
+                              roomSearchResult
+                                  .chunk[i].canonicalAlias?.localpart ??
+                              L10n.of(context)!.group,
+                          avatar: roomSearchResult.chunk[i].avatarUrl,
+                          numJoinedMembers:
+                              roomSearchResult.chunk[i].numJoinedMembers,
+                          description: roomSearchResult.chunk[i].topic,
+                          onPressed: () => showAdaptiveBottomSheet(
+                            context: context,
+                            builder: (c) => PublicRoomBottomSheet(
+                              roomAlias:
+                                  roomSearchResult.chunk[i].canonicalAlias ??
+                                      roomSearchResult.chunk[i].roomId,
+                              outerContext: context,
+                              chunk: roomSearchResult.chunk[i],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ]),
+                  ),
+                if (client.prevBatch == null &&
+                    controller.activeFilter == ActiveFilter.groups)
+                  ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: roomSearchResult!.chunk.length,
+                    itemBuilder: (context, i) => _SearchItem(
+                      title: roomSearchResult.chunk[i].name ??
+                          roomSearchResult.chunk[i].canonicalAlias?.localpart ??
+                          L10n.of(context)!.group,
+                      avatar: roomSearchResult.chunk[i].avatarUrl,
+                      onPressed: () => showAdaptiveBottomSheet(
+                        context: context,
+                        builder: (c) => PublicRoomBottomSheet(
+                          roomAlias: roomSearchResult.chunk[i].canonicalAlias ??
+                              roomSearchResult.chunk[i].roomId,
+                          outerContext: context,
+                          chunk: roomSearchResult.chunk[i],
+                        ),
+                      ),
+                    ),
+                  ),
+                if (controller.activeFilter == ActiveFilter.settings)
+                  const SliverFillRemaining(child: Settings()),
               ],
             ),
           );
@@ -344,6 +414,69 @@ class _SearchItem extends StatelessWidget {
                 ),
               ),
             ],
+          ),
+        ),
+      );
+}
+
+class _SearchPublicRoomItem extends StatelessWidget {
+  final String title;
+  final Uri? avatar;
+  final int? numJoinedMembers;
+  final String? description;
+  final void Function() onPressed;
+
+  const _SearchPublicRoomItem({
+    required this.title,
+    this.avatar,
+    this.numJoinedMembers,
+    this.description,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: onPressed,
+        child: SizedBox(
+          width: 84,
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Container(
+              color: Theme.of(context).colorScheme.surfaceContainer,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 6),
+                  Avatar(
+                    mxContent: avatar,
+                    name: title,
+                    size: 70,
+                    //fontSize: 40,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      title,
+                      maxLines: 2,
+                      textAlign: TextAlign.center,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(4.0),
+                    child: Text(
+                      L10n.of(context)!.countParticipants(
+                        numJoinedMembers ?? 0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
       );

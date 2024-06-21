@@ -110,7 +110,7 @@ slots:
   dbus-svc:
     interface: dbus
     bus: session
-    name: chat.fluffy.fluffychat
+    name: de.hermannschule.hermannpost
 
 apps:
   fluffychat:

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fluffychat/config/app_config.dart';
 import 'package:flutter/material.dart';
 
 import 'package:matrix/matrix.dart';
@@ -165,23 +166,37 @@ class ChatSearchController extends State<ChatSearchPage>
   }
 
   void _onTabChanged() {
-    switch (tabController.index) {
-      case 1:
-        startGallerySearch();
-        break;
-      case 2:
-        startFileSearch();
-        break;
-      default:
-        restartSearch();
-        break;
+    if (AppConfig.isTeacher) {
+      switch (tabController.index) {
+        case 1:
+          startGallerySearch();
+          break;
+        case 2:
+          startFileSearch();
+          break;
+        default:
+          restartSearch();
+          break;
+      }
+    } else {
+      switch (tabController.index) {
+        case 1:
+          startGallerySearch();
+          break;
+
+        default:
+          restartSearch();
+          break;
+      }
     }
   }
 
   @override
   void initState() {
     super.initState();
-    tabController = TabController(initialIndex: 0, length: 3, vsync: this);
+    tabController = AppConfig.isTeacher
+        ? TabController(initialIndex: 0, length: 3, vsync: this)
+        : TabController(initialIndex: 0, length: 2, vsync: this);
     tabController.addListener(_onTabChanged);
   }
 

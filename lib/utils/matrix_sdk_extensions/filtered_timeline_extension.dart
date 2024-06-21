@@ -17,6 +17,11 @@ extension IsStateExtension on Event {
       // if we enabled to hide all unknown events, don't show those
       (!AppConfig.hideUnknownEvents || isEventTypeKnown) &&
       // remove state events that we don't want to render
+      // hide unimportant state events
+      (!AppConfig.hideUnimportantStateEvents ||
+          !isState ||
+          importantStateEvents.contains(type)) &&
+      // hide simple join/leave member events in public rooms
       (isState || !AppConfig.hideAllStateEvents) &&
       // hide simple join/leave member events in public rooms
       (!AppConfig.hideUnimportantStateEvents ||
@@ -25,6 +30,13 @@ extension IsStateExtension on Event {
           content.tryGet<String>('membership') == 'ban' ||
           stateKey != senderId);
 
+  static const Set<String> importantStateEvents = {
+    EventTypes.Encryption,
+    EventTypes.RoomCreate,
+    // EventTypes.RoomMember,
+    //EventTypes.RoomTombstone,
+    //EventTypes.CallInvite,
+  };
   bool get isState => !{
         EventTypes.Message,
         EventTypes.Sticker,

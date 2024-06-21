@@ -225,6 +225,9 @@ class _AdaptableReactorsDialog extends StatelessWidget {
     final title = Center(child: Text(reactionEntry!.key));
 
     return AlertDialog.adaptive(
+      titleTextStyle: const TextStyle(
+        fontSize: 50,
+      ),
       title: title,
       content: body,
     );

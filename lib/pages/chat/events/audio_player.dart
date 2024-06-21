@@ -230,7 +230,7 @@ class AudioPlayerState extends State<AudioPlayerWidget> {
                         color: widget.color,
                       ),
                     ),
-                    onLongPress: () => widget.event.saveFile(context),
+                    // onLongPress: () => widget.event.saveFile(context),
                     onTap: () {
                       if (status == AudioPlayerStatus.downloaded) {
                         _playAction();

@@ -1,3 +1,4 @@
+import 'package:fluffychat/config/app_config.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_gen/gen_l10n/l10n.dart';
@@ -67,7 +68,8 @@ class ChatSearchView extends StatelessWidget {
               tabs: [
                 Tab(child: Text(L10n.of(context)!.messages)),
                 Tab(child: Text(L10n.of(context)!.gallery)),
-                Tab(child: Text(L10n.of(context)!.files)),
+                if (AppConfig.isTeacher)
+                  Tab(child: Text(L10n.of(context)!.files)),
               ],
             ),
             Expanded(
@@ -85,11 +87,12 @@ class ChatSearchView extends StatelessWidget {
                     startSearch: controller.startGallerySearch,
                     searchStream: controller.galleryStream,
                   ),
-                  ChatSearchFilesTab(
-                    room: room,
-                    startSearch: controller.startFileSearch,
-                    searchStream: controller.fileStream,
-                  ),
+                  if (AppConfig.isTeacher)
+                    ChatSearchFilesTab(
+                      room: room,
+                      startSearch: controller.startFileSearch,
+                      searchStream: controller.fileStream,
+                    ),
                 ],
               ),
             ),

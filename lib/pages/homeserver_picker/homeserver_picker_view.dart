@@ -29,12 +29,12 @@ class HomeserverPickerView extends StatelessWidget {
     final regLink = publicHomeserver?.regLink;
     return LoginScaffold(
       enforceMobileMode: Matrix.of(context).client.isLogged(),
-      appBar: AppBar(
-        titleSpacing: 12,
-        automaticallyImplyLeading: false,
-        surfaceTintColor: Theme.of(context).colorScheme.surface,
-        title: HomeserverAppBar(controller: controller),
-      ),
+      // appBar: AppBar(
+      //   titleSpacing: 12,
+      //   automaticallyImplyLeading: false,
+      //   surfaceTintColor: Theme.of(context).colorScheme.surface,
+      //   title: HomeserverAppBar(controller: controller),
+      // ),
       body: Column(
         children: [
           // display a prominent banner to import session for TOR browser
@@ -98,72 +98,83 @@ class HomeserverPickerView extends StatelessWidget {
                         ),
                         const SizedBox(height: 36),
                       ] else
-                        Padding(
-                          padding: const EdgeInsets.only(
-                            top: 0.0,
-                            right: 8.0,
-                            left: 8.0,
-                            bottom: 16.0,
-                          ),
-                          child: Image.asset(
-                            'assets/banner_transparent.png',
-                          ),
-                        ),
-                      if (identityProviders != null) ...[
-                        ...identityProviders.map(
-                          (provider) => _LoginButton(
-                            icon: provider.icon == null
-                                ? const Icon(
-                                    Icons.open_in_new_outlined,
-                                    size: 16,
-                                  )
-                                : Material(
-                                    borderRadius: BorderRadius.circular(
-                                      AppConfig.borderRadius,
-                                    ),
-                                    clipBehavior: Clip.hardEdge,
-                                    child: MxcImage(
-                                      placeholder: (_) => const Icon(
-                                        Icons.open_in_new_outlined,
-                                        size: 16,
-                                      ),
-                                      uri: Uri.parse(provider.icon!),
-                                      width: 24,
-                                      height: 24,
-                                      isThumbnail: false,
-                                      //isThumbnail: false,
-                                    ),
-                                  ),
-                            label: L10n.of(context)!.signInWith(
-                              provider.name ??
-                                  provider.brand ??
-                                  L10n.of(context)!.singlesignon,
+                        Column(
+                          children: [
+                            const SizedBox(height: 40),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 0.0,
+                                right: 8.0,
+                                left: 8.0,
+                                bottom: 16.0,
+                              ),
+                              child: Image.asset(
+                                'assets/hermannpost-banner.png',
+                              ),
                             ),
-                            onPressed: () =>
-                                controller.ssoLoginAction(provider.id),
+                          ],
+                        ),
+                      // if (identityProviders != null) ...[
+                      //   ...identityProviders.map(
+                      //     (provider) => _LoginButton(
+                      //       icon: provider.icon == null
+                      //           ? const Icon(
+                      //               Icons.open_in_new_outlined,
+                      //               size: 16,
+                      //             )
+                      //           : Material(
+                      //               borderRadius: BorderRadius.circular(
+                      //                 AppConfig.borderRadius,
+                      //               ),
+                      //               clipBehavior: Clip.hardEdge,
+                      //               child: MxcImage(
+                      //                 placeholder: (_) => const Icon(
+                      //                   Icons.open_in_new_outlined,
+                      //                   size: 16,
+                      //                 ),
+                      //                 uri: Uri.parse(provider.icon!),
+                      //                 width: 24,
+                      //                 height: 24,
+                      //                 isThumbnail: false,
+                      //                 //isThumbnail: false,
+                      //               ),
+                      //             ),
+                      //       label: L10n.of(context)!.signInWith(
+                      //         provider.name ??
+                      //             provider.brand ??
+                      //             L10n.of(context)!.singlesignon,
+                      //       ),
+                      //       onPressed: () =>
+                      //           controller.ssoLoginAction(provider.id),
+                      //     ),
+                      //   ),
+                      // ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: ElevatedButton.icon(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                Theme.of(context).colorScheme.primary,
+                            foregroundColor:
+                                Theme.of(context).colorScheme.onPrimary,
                           ),
+                          onPressed: controller.qrLogin,
+                          onLongPress: controller.login,
+                          icon: const Icon(Icons.login_outlined),
+                          label: Text(L10n.of(context)!.login),
                         ),
-                      ],
-                      if (controller.supportsPasswordLogin)
-                        _LoginButton(
-                          onPressed: controller.login,
-                          label: L10n.of(context)!.signInWithPassword,
-                          icon: const Icon(Icons.lock_open_outlined, size: 16),
-                        ),
-                      if (regLink != null)
-                        _LoginButton(
-                          onPressed: () => launchUrlString(regLink),
-                          icon: const Icon(
-                            Icons.open_in_new_outlined,
-                            size: 16,
-                          ),
-                          label: L10n.of(context)!.register,
-                        ),
-                      _LoginButton(
-                        onPressed: controller.restoreBackup,
-                        label: L10n.of(context)!.hydrate,
-                        withBorder: false,
                       ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: TextButton(
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                          ),
+                          onPressed: controller.restoreBackup,
+                          child: Text(L10n.of(context)!.hydrate),
+                        ),
+                      ),
+
                       const SizedBox(height: 16),
                     ],
                   ),
@@ -178,12 +189,14 @@ class _LoginButton extends StatelessWidget {
   final Widget? icon;
   final String label;
   final void Function() onPressed;
+  final void Function() onLongPressed;
   final bool withBorder;
 
   const _LoginButton({
     this.icon,
     required this.label,
     required this.onPressed,
+    required this.onLongPressed,
     this.withBorder = true,
   });
 

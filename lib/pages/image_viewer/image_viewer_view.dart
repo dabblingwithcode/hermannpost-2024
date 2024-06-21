@@ -26,28 +26,28 @@ class ImageViewerView extends StatelessWidget {
         ),
         backgroundColor: const Color(0x44000000),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.reply_outlined),
-            onPressed: controller.forwardAction,
-            color: Colors.white,
-            tooltip: L10n.of(context)!.share,
-          ),
-          IconButton(
-            icon: const Icon(Icons.download_outlined),
-            onPressed: () => controller.saveFileAction(context),
-            color: Colors.white,
-            tooltip: L10n.of(context)!.downloadFile,
-          ),
-          if (PlatformInfos.isMobile)
-            // Use builder context to correctly position the share dialog on iPad
-            Builder(
-              builder: (context) => IconButton(
-                onPressed: () => controller.shareFileAction(context),
-                tooltip: L10n.of(context)!.share,
-                color: Colors.white,
-                icon: Icon(Icons.adaptive.share_outlined),
-              ),
-            ),
+          // IconButton(
+          //   icon: const Icon(Icons.reply_outlined),
+          //   onPressed: controller.forwardAction,
+          //   color: Colors.white,
+          //   tooltip: L10n.of(context)!.share,
+          // ),
+          // IconButton(
+          //   icon: const Icon(Icons.download_outlined),
+          //   onPressed: () => controller.saveFileAction(context),
+          //   color: Colors.white,
+          //   tooltip: L10n.of(context)!.downloadFile,
+          // ),
+          // if (PlatformInfos.isMobile)
+          //   // Use builder context to correctly position the share dialog on iPad
+          //   Builder(
+          //     builder: (context) => IconButton(
+          //       onPressed: () => controller.shareFileAction(context),
+          //       tooltip: L10n.of(context)!.share,
+          //       color: Colors.white,
+          //       icon: Icon(Icons.adaptive.share_outlined),
+          //     ),
+          //   ),
         ],
       ),
       body: InteractiveViewer(
