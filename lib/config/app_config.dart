@@ -33,13 +33,13 @@ abstract class AppConfig {
   static String _webBaseUrl = 'https://fluffychat.im/web';
   static String get webBaseUrl => _webBaseUrl;
   static const String sourceCodeUrl =
-      'https://github.com/hermanncoders/hermannpost';
+      'https://github.com/dabblingwithcode/hermannpost-2024';
   static const String supportUrl =
-      'https://github.com/hermanncoders/hermannpost/issues';
+      'https://github.com/dabblingwithcode/hermannpost-2024/issues';
   static final Uri newIssueUrl = Uri(
     scheme: 'https',
     host: 'github.com',
-    path: 'hermanncoders/hermannpost/issues/new',
+    path: 'dabblingwithcode/hermannpost-2024/issues/new',
   );
   static bool renderHtml = true;
   static bool hideRedactedEvents = true;

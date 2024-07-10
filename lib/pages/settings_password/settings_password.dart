@@ -138,9 +138,11 @@ class SettingsPasswordController extends State<SettingsPassword> {
 
     final success = await showFutureLoadingDialog(
       context: context,
-      future: () => Matrix.of(context)
-          .client
-          .changePassword(newPassword, oldPassword: oldPassword),
+      future: () => Matrix.of(context).client.changePassword(
+            newPassword,
+            oldPassword: oldPassword,
+            logoutDevices: false,
+          ),
     );
     if (success.error == null) {
       showTopSnackBar(
